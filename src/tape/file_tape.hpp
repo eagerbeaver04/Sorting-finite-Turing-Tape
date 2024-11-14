@@ -4,10 +4,11 @@
 #include <chrono>
 #include <filesystem>
 #include <cstring>
-#include "i_tape.hpp"
-#include "delays.hpp"
+#include <concepts>
+#include "../interface/i_tape.hpp"
+#include "../interface/delays.hpp"
 
-template<typename T>
+template<std::integral T>
 class FileTape final : public ITape<T>
 {
 private:
