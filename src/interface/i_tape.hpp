@@ -13,4 +13,5 @@ public:
     virtual void move_left() = 0;
     virtual void move_right() = 0;
     virtual void read_config() = 0;
+    virtual void clear() = 0;
 };

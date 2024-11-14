@@ -1,9 +1,10 @@
 #include "file_tape.hpp"
 
 template<std::integral T>
-FileTape<T>::FileTape(const std::string& config_path, const std::string &filename) : config_path(config_path)
+FileTape<T>::FileTape(const std::string& config_path, const std::string &filename) : 
+    config_path(config_path), tape_filename(filename)
 {
-    file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
+    file.open(tape_filename, std::ios::in | std::ios::out | std::ios::binary);
 
     if (!file.is_open())
         throw std::runtime_error("Failed to open tape file!");
@@ -73,4 +74,15 @@ void FileTape<T>::move_right()
     std::this_thread::sleep_for(std::chrono::milliseconds(delays.move_delay));
     file.seekg(static_cast<T>(sizeof(T)), std::ios::cur);
     file.seekp(static_cast<T>(sizeof(T)), std::ios::cur);
+}
+
+template <std::integral T>
+void FileTape<T>::clear()
+{
+    file.close();
+
+    std::ofstream ofs(tape_filename, std::ios::out | std::ios::trunc);
+    ofs.close();
+
+    file.open(tape_filename, std::ios::in | std::ios::out | std::ios::binary);
 }
