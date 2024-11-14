@@ -1,6 +1,7 @@
 #include "file_tape.hpp"
 
-FileTape::FileTape(const std::string &config_path, const std::string &filename) : config_path(config_path)
+template<typename T>
+FileTape<T>::FileTape(const std::string &config_path, const std::string &filename) : config_path(config_path)
 {
     file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
 
@@ -10,7 +11,8 @@ FileTape::FileTape(const std::string &config_path, const std::string &filename) 
     read_config();
 }
 
-void FileTape::read_config()
+template<typename T>
+void FileTape<T>::read_config()
 {
     std::ifstream file(config_path);
     if(!file)
@@ -18,42 +20,57 @@ void FileTape::read_config()
     file >> delays;
 }
 
-FileTape::~FileTape() 
+template<typename T>
+FileTape<T>::~FileTape() 
 {
     if (file.is_open())
         file.close();
 }
 
-int FileTape::read()
+template<typename T>
+T FileTape<T>::read()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(delays.read_delay));
-    int value;
-    file.read(reinterpret_cast<char *>(&value), sizeof(value));
+    T value;
+    char buffer[sizeof(T)];
+
+    file.read(buffer, sizeof(buffer));
+    if (file.gcount() != sizeof(T))
+        throw std::runtime_error("Failed to read full integer from file!");
+
+    std::memcpy(&value, buffer, sizeof(T));
     return value;
 }
 
-void FileTape::write(int value) 
+template<typename T>
+void FileTape<T>::write(T&& value) 
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(delays.write_delay));
-    file.write(reinterpret_cast<const char *>(&value), sizeof(value));
+    char buffer[sizeof(T)];
+
+    std::memcpy(buffer, &value, sizeof(T));
+    file.write(buffer, sizeof(buffer));
 }
 
-void FileTape::rewind() 
+template<typename T>
+void FileTape<T>::rewind() 
 {
     file.seekg(0);
     file.seekp(0);
 }
 
-void FileTape::move_left() 
+template<typename T>
+void FileTape<T>::move_left() 
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(delays.move_delay));
-    file.seekg(-static_cast<int>(sizeof(int)), std::ios::cur);
-    file.seekp(-static_cast<int>(sizeof(int)), std::ios::cur);
+    file.seekg(-static_cast<T>(sizeof(T)), std::ios::cur);
+    file.seekp(-static_cast<T>(sizeof(T)), std::ios::cur);
 }
 
-void FileTape::move_right() 
+template<typename T>
+void FileTape<T>::move_right() 
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(delays.move_delay));
-    file.seekg(static_cast<int>(sizeof(int)), std::ios::cur);
-    file.seekp(static_cast<int>(sizeof(int)), std::ios::cur);
+    file.seekg(static_cast<T>(sizeof(T)), std::ios::cur);
+    file.seekp(static_cast<T>(sizeof(T)), std::ios::cur);
 }

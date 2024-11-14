@@ -9,7 +9,7 @@ struct Delays
     int write_delay;
     int move_delay;
 
-    friend std::ifstream& operator>>(std::ifstream &in, Delays &delay)
+    friend std::ifstream& operator >> (std::ifstream &in, Delays &delay)
     {
         in >> delay.read_delay;
         in >> delay.write_delay;
