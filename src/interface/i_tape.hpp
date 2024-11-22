@@ -8,7 +8,7 @@ public:
     virtual ~ITape() = default;
 
     virtual T read() = 0;
-    virtual void write(T&& value) = 0;
+    virtual void write(const T& value) = 0;
     virtual void rewind() = 0;
     virtual void move_left() = 0;
     virtual void move_right() = 0;

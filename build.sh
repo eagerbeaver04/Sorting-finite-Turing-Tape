@@ -29,4 +29,6 @@ cd "$initial_dir" || { echo "Failed to exit build directory."; exit 1; }
 mv "$initial_dir/build/tape_sorting" "$initial_dir/tape_sorting"
 rm -rf "$initial_dir/build"
 
+mkdir -p tmp
+
 "$initial_dir/tape_sorting" "$initial_dir/config.txt"
