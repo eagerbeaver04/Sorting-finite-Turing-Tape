@@ -1,3 +1,6 @@
 .vscode
 build
 tape_sorting
+run_tests
+tests/configs
+tests/inputs

@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "file_tape.hpp"
 
-namespace
+namespace utils
 {
     template <std::random_access_iterator I, std::sentinel_for<I> S>
         requires std::sortable<I>
@@ -47,15 +47,15 @@ private:
     int chunks_number;
     T<N> input_tape;
     T<N> output_tape;
-    std::array<T<N>, 2> tmp_tapes;
-    std::vector<N> loaded_data;
+    std::array<T<N>, 2> tmp_tapes{};
+    std::vector<N> loaded_data{};
 
     void prepare_tmp_tapes()
     {
-        for(int i : std::ranges::iota_view(0, tmp_tapes.size()))
+        for(size_t i =0; i < tmp_tapes.size(); ++i)
         {
             std::string file_path = "tmp/tmp_line_" + std::to_string(i) + ".bin";
-            create_file_if_not_exist(file_path);
+            utils::create_file_if_not_exist(file_path);
             tmp_tapes[i] = std::move(T<N>(config_path, file_path));
         }
     }
@@ -117,18 +117,20 @@ private:
             tape.write(el);
     }
 public:
-    TapeSorter(const std::string& config_path, const std::string& input_file, const std::string& output_file, size_t M):
-        config_path(config_path), M(M)
+    TapeSorter(const std::string& config_path, const std::string& input_file, const std::string& output_file, int max_size):
+        config_path(config_path), M(max_size)
     {
         if (!std::filesystem::exists(input_file))
             throw std::runtime_error("No input file!");
+        if (std::filesystem::file_size(input_file) == 0)
+            throw std::runtime_error("Empty input file!");
         if (!std::filesystem::exists(config_path))
             throw std::runtime_error("No config file!");
 
-        create_file_if_not_exist(output_file);
-        
-        input_tape(config_path, input_file);
-        output_tape(config_path, output_file);
+        utils::create_file_if_not_exist(output_file);
+
+        input_tape = std::move(T<N>{config_path, input_file});
+        output_tape = std::move(T<N>{config_path, output_file});
 
         chunk_size = M / sizeof(N);
         loaded_data.reserve(chunk_size);
