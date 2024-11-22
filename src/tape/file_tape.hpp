@@ -82,4 +82,8 @@ public:
             throw std::runtime_error("Failed to open config file!");
         file >> delays;
     }
+    virtual bool is_eof() override
+    {
+        return file.eof();
+    }
 };
