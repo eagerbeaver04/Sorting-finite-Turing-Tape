@@ -29,15 +29,15 @@ cd "$initial_dir" || { echo "Failed to exit build directory."; exit 1; }
 mv "$initial_dir/build/tape_sorting" "$initial_dir/tape_sorting"
 mv "$initial_dir/build/tests/run_tests" "$initial_dir/run_tests"
 
-# rm -rf "$initial_dir/build"
+rm -rf "$initial_dir/build"
 
 mkdir -p "$initial_dir/tmp"
 
 rm -rf "$initial_dir/tests/configs"
 rm -rf "$initial_dir/tests/inputs"
 rm -rf "$initial_dir/tests/outputs"
-mkdir "$initial_dir/tests/configs"
-mkdir "$initial_dir/tests/inputs"
-mkdir "$initial_dir/tests/outputs"
+mkdir -p "$initial_dir/tests/configs"
+mkdir -p "$initial_dir/tests/inputs"
+mkdir -p "$initial_dir/tests/outputs"
 
-"$initial_dir/tape_sorting" "$initial_dir/config.txt"
+"$initial_dir/tape_sorting" "$initial_dir/config.txt" 1000

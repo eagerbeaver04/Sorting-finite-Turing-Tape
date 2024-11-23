@@ -4,7 +4,6 @@
 #include <array>
 #include <vector>
 #include <ranges>
-#include <cmath>
 #include <algorithm>
 #include "file_tape.hpp"
 
@@ -110,7 +109,7 @@ private:
                 std::optional<N> opt_val = input_tape.read();
                 if (!opt_val)
                     return;
-                loaded_data.push_back(*opt_val);
+                loaded_data.push_back(opt_val.value());
             });
         utils::merge_sort(loaded_data.begin(), loaded_data.end());
     }
@@ -142,8 +141,15 @@ public:
         chunk_size = M / sizeof(N);
         loaded_data.reserve(chunk_size);
 
-        chunks_number = std::ceil(static_cast<double>(std::filesystem::file_size(input_file)) / M);
+        size_t total_elements = std::filesystem::file_size(input_file) / sizeof(N);
+        chunks_number = (total_elements + chunk_size - 1) / chunk_size;
 
+        // std::cout << "file size (bytes)= " << std::filesystem::file_size(input_file) 
+        //     <<  ", number of elements = " << total_elements 
+        //     <<", chunks number = " << chunks_number 
+        //     << "\n\telements in chunk = " << chunk_size 
+        //     << ", size of chunk (bytes)= " << chunk_size * sizeof(N) 
+        //     << ", memory limit (bytes)= " << M << std::endl;
         prepare_tmp_tapes();
     }
 
@@ -157,7 +163,7 @@ public:
             return;
         }
         save_chunk_in_tape(tmp_tapes[0]);
-        for (size_t i = 1; i < chunk_size; ++i)
+        for (size_t i = 1; i < chunks_number; ++i)
         {
             read_chunk();
             if (i == chunks_number - 1) [[unlikely]]

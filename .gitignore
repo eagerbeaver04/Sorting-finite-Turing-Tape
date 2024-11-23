@@ -6,3 +6,4 @@ tests/configs
 tests/inputs
 tests/outputs
 tmp
+files/output.bin

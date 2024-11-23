@@ -3,11 +3,13 @@
 
 int main(int argc, char *argv[])
 {
-    if(argc != 2)
+    if(argc != 3)
     {
         std::cerr << "Incorrect format!";
         return 1;
     }
-    TapeSorter<FileTape, int> sorter(std::string(argv[1]), "file1.bin", "file2.bin", 10);
+    TapeSorter<FileTape, int> sorter(std::string(argv[1]), 
+        "files/input.bin", "files/output.bin", std::stoul(argv[2]));
+    sorter.sort();
     return 0;
 }

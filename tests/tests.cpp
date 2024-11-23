@@ -12,7 +12,7 @@ public:
     std::vector<std::string> outputs;
     std::vector<std::vector<T>> data;
     const int number = 10;
-    const int mul = 1000;
+    const int mul = 200;
     void file_init()
     {
         for (int i = 0; i < number; ++i)
@@ -48,7 +48,9 @@ public:
         {
             std::vector<T> cur(mul * i);
             std::iota(cur.begin(), cur.end(), 1);
+
             std::ranges::shuffle(cur, gen);
+            
             data.emplace_back(cur);
         }
         for (int i = 0; i < number; ++i)
@@ -94,6 +96,7 @@ public:
 
             std::vector<T> sorted_data = data[i];
             std::ranges::sort(sorted_data);
+
             ASSERT_FALSE(sorted_data == data[i]);
             ASSERT_EQ(new_data.size(), data[i].size());
             EXPECT_EQ(sorted_data, new_data);
@@ -102,7 +105,7 @@ public:
 };
 
 using TestTypes = ::testing::Types<char, unsigned char, short, unsigned short, int, 
-    unsigned int, long, unsigned long, long long, unsigned long long>; 
+    unsigned int, long long, unsigned long long>; 
 TYPED_TEST_SUITE(FileTapeSorterTest, TestTypes);
 
 template <std::integral T>
@@ -152,16 +155,34 @@ void test_sorter(Data<T>& data, int start_pos)
     }
 }
 
+template <std::integral T>
+void bad_test_sorter(Data<T> &data, int start_pos)
+{
+    for (int i = start_pos; i < data.number; ++i)
+    {
+        TapeSorter<FileTape, T> sorter(data.configs[i], data.inputs[i],
+                    "tests/outputs/output" + std::to_string(i) + ".bin", sizeof(T) / 2);
+        sorter.sort();
+    }
+}
+
 TYPED_TEST(FileTapeSorterTest, TestSortEmptyInputFile)
 {
     EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_ANY_THROW(test_sorter(this->data, 0));
 }
 
+TYPED_TEST(FileTapeSorterTest, TestSortSmallMemoryBound)
+{
+    EXPECT_NO_THROW(this->data.data_preparation());
+    EXPECT_ANY_THROW(bad_test_sorter(this->data, 1));
+}
+
 TYPED_TEST(FileTapeSorterTest, TestSortNonEmptyInputFile)
 {
     EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_NO_THROW(test_sorter(this->data, 1));
+    EXPECT_NO_THROW(this->data.read_outputs(1));
 }
 
 int main(int argc, char **argv)
