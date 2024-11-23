@@ -24,10 +24,7 @@ namespace utils
 
     void create_file_if_not_exist(const std::string &file_path)
     {
-        if (!std::filesystem::exists(file_path))
-            std::ofstream outfile(file_path);
-        else
-            std::ofstream file(file_path, std::ios::trunc);
+        std::ofstream file(file_path, std::ios::trunc);
     }
 }
 
