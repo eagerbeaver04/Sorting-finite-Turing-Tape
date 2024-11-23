@@ -25,10 +25,7 @@ namespace utils
     void create_file_if_not_exist(const std::string &file_path)
     {
         if (!std::filesystem::exists(file_path))
-        {
             std::ofstream outfile(file_path);
-            outfile.close();
-        }
         else
             std::ofstream file(file_path, std::ios::trunc);
     }
@@ -42,7 +39,6 @@ template <template <typename> typename T, typename N>
 class TapeSorter
 {
 private:
-    std::string config_path;
     size_t M;
     size_t chunk_size;
     size_t chunks_number;
@@ -51,7 +47,7 @@ private:
     std::array<T<N>, 2> tmp_tapes{};
     std::vector<N> loaded_data{};
 
-    void prepare_tmp_tapes()
+    void prepare_tmp_tapes(const std::string &config_path)
     {
         for(size_t i =0; i < tmp_tapes.size(); ++i)
         {
@@ -122,7 +118,7 @@ private:
     }
 public:
     TapeSorter(const std::string& config_path, const std::string& input_file, const std::string& output_file, size_t max_size):
-        config_path(config_path), M(max_size)
+        M(max_size)
     {
         if (M < sizeof(N))
             throw std::runtime_error("Too small chunk size!");
@@ -150,7 +146,7 @@ public:
         //     << "\n\telements in chunk = " << chunk_size 
         //     << ", size of chunk (bytes)= " << chunk_size * sizeof(N) 
         //     << ", memory limit (bytes)= " << M << std::endl;
-        prepare_tmp_tapes();
+        prepare_tmp_tapes(config_path);
     }
 
     void sort()
