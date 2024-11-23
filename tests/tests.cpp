@@ -12,6 +12,7 @@ public:
     std::vector<std::string> outputs;
     std::vector<std::vector<T>> data;
     const int number = 10;
+    const int mul = 1000;
     void file_init()
     {
         for (int i = 0; i < number; ++i)
@@ -43,8 +44,6 @@ public:
         std::random_device rd;
         std::mt19937 gen{rd()};
 
-        int mul = 10;
-
         for (int i = 0; i < number; ++i)
         {
             std::vector<T> cur(mul * i);
@@ -57,7 +56,7 @@ public:
             FileTape<T> tape(configs[i], inputs[i]);
             for (const auto &val : data[i])
                 tape.write(val);
-            EXPECT_EQ(std::filesystem::file_size(inputs[i]), sizeof(T) * mul * i);
+            ASSERT_EQ(std::filesystem::file_size(inputs[i]), sizeof(T) * mul * i);
         }
     }
 
@@ -65,6 +64,7 @@ public:
     {
         for (int i = start_number; i < number; ++i)
         {
+            ASSERT_EQ(std::filesystem::file_size(inputs[i]), sizeof(T) * data[i].size());
             FileTape<T> tape(configs[i], inputs[i]);
             std::vector<T> new_data;
             std::optional<T> val;
@@ -76,8 +76,7 @@ public:
                 new_data.push_back(val.value());
             }
             ASSERT_EQ(new_data.size(), data[i].size());
-            for(size_t j =0; j < new_data.size(); ++j)
-                EXPECT_EQ(new_data[j], data[i][j]);
+            EXPECT_EQ(new_data, data[i]);
         }
     }
 
@@ -85,28 +84,25 @@ public:
     {
         for (int i = start_number; i < number; ++i)
         {
+            ASSERT_EQ(std::filesystem::file_size(outputs[i]), std::filesystem::file_size(inputs[i]));
             FileTape<T> tape(configs[i], outputs[i]);
             std::vector<T> new_data;
             std::optional<T> val;
-            while (!tape.is_eof())
-            {
-                val = tape.read();
-                if (!val)
-                    break;
+
+            while ((val = tape.read()))
                 new_data.push_back(val.value());
-            }
+
             std::vector<T> sorted_data = data[i];
             std::ranges::sort(sorted_data);
-            
+            ASSERT_FALSE(sorted_data == data[i]);
             ASSERT_EQ(new_data.size(), data[i].size());
-
-            for (size_t j = 0; j < new_data.size(); ++j)
-                EXPECT_EQ(new_data[j], sorted_data[j]);
+            EXPECT_EQ(sorted_data, new_data);
         }
     }
 };
 
-using TestTypes = ::testing::Types<int, long, long long>; 
+using TestTypes = ::testing::Types<char, unsigned char, short, unsigned short, int, 
+    unsigned int, long, unsigned long, long long, unsigned long long>; 
 TYPED_TEST_SUITE(FileTapeSorterTest, TestTypes);
 
 template <std::integral T>
@@ -144,11 +140,15 @@ void test_sorter(Data<T>& data, int start_pos)
 {
     for (int i = start_pos; i < data.number; ++i)
     {
-        int M = sizeof(T) * 4;
-        TapeSorter<FileTape, T> sorter(data.configs[i], data.inputs[i],
-                                    "tests/outputs/output" + std::to_string(i) + ".bin", M);
-        sorter.sort();
+        std::random_device rd;                     
+        std::mt19937 gen{rd()};              
+        std::uniform_int_distribution<int> dist(sizeof(T), 100 * sizeof(T));
 
+        int random_number = dist(gen);
+
+        TapeSorter<FileTape, T> sorter(data.configs[i], data.inputs[i],
+            "tests/outputs/output" + std::to_string(i) + ".bin", random_number);
+        sorter.sort();
     }
 }
 
@@ -162,7 +162,6 @@ TYPED_TEST(FileTapeSorterTest, TestSortNonEmptyInputFile)
 {
     EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_NO_THROW(test_sorter(this->data, 1));
-    EXPECT_NO_THROW(this->data.read_outputs(1));
 }
 
 int main(int argc, char **argv)

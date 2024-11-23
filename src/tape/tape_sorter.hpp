@@ -44,9 +44,9 @@ class TapeSorter
 {
 private:
     std::string config_path;
-    int M;
-    int chunk_size;
-    int chunks_number;
+    size_t M;
+    size_t chunk_size;
+    size_t chunks_number;
     T<N> input_tape;
     T<N> output_tape;
     std::array<T<N>, 2> tmp_tapes{};
@@ -93,10 +93,8 @@ private:
         {
             output_tmp_tape.write(loaded_data[i]);
         }
-        while (!input_tmp_tape.is_eof())
+        while (val)
         {
-            if (!val)
-                break;
             output_tmp_tape.write(val.value());
             val = input_tmp_tape.read();
         }
@@ -124,15 +122,17 @@ private:
             tape.write(el);
     }
 public:
-    TapeSorter(const std::string& config_path, const std::string& input_file, const std::string& output_file, int max_size):
+    TapeSorter(const std::string& config_path, const std::string& input_file, const std::string& output_file, size_t max_size):
         config_path(config_path), M(max_size)
     {
+        if (M < sizeof(N))
+            throw std::runtime_error("Too small chunk size!");
         if (!std::filesystem::exists(input_file))
-            throw std::runtime_error("No input file!");
+            throw std::runtime_error("No input file! " + input_file);
         if (std::filesystem::file_size(input_file) == 0)
-            throw std::runtime_error("Empty input file!");
+            throw std::runtime_error("Empty input file! " + input_file);
         if (!std::filesystem::exists(config_path))
-            throw std::runtime_error("No config file!");
+            throw std::runtime_error("No config file! " + config_path);
 
         utils::create_file_if_not_exist(output_file);
 
@@ -157,8 +157,7 @@ public:
             return;
         }
         save_chunk_in_tape(tmp_tapes[0]);
-
-        for (int i : std::ranges::iota_view{1, chunks_number})
+        for (size_t i = 1; i < chunk_size; ++i)
         {
             read_chunk();
             if (i == chunks_number - 1) [[unlikely]]
