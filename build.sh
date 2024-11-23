@@ -35,7 +35,9 @@ mkdir -p "$initial_dir/tmp"
 
 rm -rf "$initial_dir/tests/configs"
 rm -rf "$initial_dir/tests/inputs"
+rm -rf "$initial_dir/tests/outputs"
 mkdir "$initial_dir/tests/configs"
 mkdir "$initial_dir/tests/inputs"
+mkdir "$initial_dir/tests/outputs"
 
 "$initial_dir/tape_sorting" "$initial_dir/config.txt"

@@ -12,19 +12,17 @@ template<std::integral T>
 class FileTape final : public ITape<T>
 {
 private:
-    std::string config_path;
-    std::string tape_filename;
     std::fstream file;
     Delays delays;
 public:
-    FileTape(const std::string &config_path, const std::string &filename) : 
-        config_path(config_path), tape_filename(filename)
+    FileTape(const std::string &config_path, const std::string &tape_filename)
     {
         file.open(tape_filename, std::ios::in | std::ios::out | std::ios::binary);
 
         if (!file.is_open())
             throw std::runtime_error("Failed to open tape file! " + tape_filename);
-        read_config();
+
+        read_config(config_path);
     }
 
     FileTape() = default;
@@ -39,7 +37,7 @@ public:
         if (file.is_open())
             file.close();
     }
-    virtual T read() override
+    virtual std::optional<T> read() override
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(delays.read_delay));
         T value;
@@ -49,11 +47,8 @@ public:
 
         file.read(buffer, sizeof(buffer));
 
-        if (file.gcount() != sizeof(T) && !is_eof())
-        {
-            std::cerr << "file.gcount() = " << file.gcount() << ", sizeof(T) = " << sizeof(T) << std::endl;
-            throw std::runtime_error("Failed to read full integer from file! " + tape_filename);
-        }
+        if (file.gcount() != sizeof(T))
+            return std::nullopt;
 
         std::memcpy(&value, buffer, sizeof(T));
         return value;
@@ -91,7 +86,7 @@ public:
         file.seekg(static_cast<T>(sizeof(T)), std::ios::cur);
         file.seekp(static_cast<T>(sizeof(T)), std::ios::cur);
     }
-    virtual void read_config() override
+    virtual void read_config(const std::string& config_path) override
     {
         std::ifstream file(config_path);
         if (!file)

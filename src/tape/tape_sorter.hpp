@@ -30,6 +30,8 @@ namespace utils
             std::ofstream outfile(file_path);
             outfile.close();
         }
+        else
+            std::ofstream file(file_path, std::ios::trunc);
     }
 }
 
@@ -64,21 +66,21 @@ private:
     {
         input_tmp_tape.rewind();
         output_tmp_tape.rewind();
-        int pos = 0;
-        N val;
+        size_t pos = 0;
+        std::optional<N> val;
         bool f = false;
         while(pos < loaded_data.size())
         {
             if(!f)
             {
                 val = input_tmp_tape.read();
-                if (input_tmp_tape.is_eof())
+                if (!val)
                     break;
                 f = true;
             }
-            if(val >= loaded_data[pos])
+            if(val.value() <= loaded_data[pos])
             {
-                output_tmp_tape.write(val);
+                output_tmp_tape.write(val.value());
                 f = false;
             }
             else
@@ -88,26 +90,31 @@ private:
             }
         }
         for (int i : std::ranges::iota_view{pos, loaded_data.size()})
+        {
             output_tmp_tape.write(loaded_data[i]);
+        }
         while (!input_tmp_tape.is_eof())
         {
+            if (!val)
+                break;
+            output_tmp_tape.write(val.value());
             val = input_tmp_tape.read();
-            if (!input_tmp_tape.is_eof())
-                output_tmp_tape.write(val);
         }
     }
 
     void read_chunk()
     {
         loaded_data.clear();
-        N val;
-        for (int i : std::ranges::iota_view{0, chunk_size})
-        {
-            val = input_tape.read();
-            if(input_tape.is_eof())
-                break;
-            loaded_data.push_back(val);
-        }
+        std::ranges::for_each(
+            std::ranges::views::iota(0) | std::ranges::views::take(chunk_size),
+            [&](auto)
+            {
+                std::optional<N> opt_val = input_tape.read();
+                if (!opt_val)
+                    return;
+                loaded_data.push_back(*opt_val);
+            });
+        utils::merge_sort(loaded_data.begin(), loaded_data.end());
     }
 
     void save_chunk_in_tape(T<N>& tape)
@@ -149,7 +156,6 @@ public:
             save_chunk_in_tape(output_tape);
             return;
         }
-
         save_chunk_in_tape(tmp_tapes[0]);
 
         for (int i : std::ranges::iota_view{1, chunks_number})
