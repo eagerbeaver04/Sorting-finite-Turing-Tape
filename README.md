@@ -58,7 +58,7 @@ This script will generate two executable files:
 
 ### Running the Application
 
-Execute the application with the configuration file, and memory limit M (1000 in example):
+Execute the application with the configuration file, and memory limit `M` (1000 in example):
 ```
 ./tape_sorting config.txt 1000
 ```
@@ -72,7 +72,7 @@ Create a configuration file (e.g., config.txt) with the following four delay val
  - read_delay=5
  - write_delay=5
  - rewind_delay=100
- - move_delay=10
+ - move_delay=0
 
 Where: 
 
@@ -112,11 +112,11 @@ The FileTape class implements the ITape interface and emulates tape operations u
  - Movement Simulation: Simulates tape movements, including rewinding and moving by positions.
 
 ### TapeSorter Class
-The TapeSorter class, found in [tape_sorter.hpp](src/tape/tape_sorter.hpp), handles the sorting algorithm using temporary tapes. It takes as template any implementation of `ITape` for more convenient support.
+The TapeSorter class, found in [tape_sorter.hpp](src/tape/tape_sorter.hpp), handles the sorting algorithm using temporary tapes. It takes as template any implementation of `ITape` for more to facilitate integration with custom tape implementations.
 
 #### Features:
 
- - Memory Management: Ensures that no more than M bytes are loaded into memory at any time.
+ - Memory Management: Ensures that no more than `M` bytes are loaded into memory at any time.
  - External Sorting Algorithm: Uses an efficient algorithm suitable for tape-based storage (merge sort).
  - Temporary Tapes: Stores intermediate results in the tmp directory.
 
@@ -125,9 +125,10 @@ The TapeSorter class, found in [tape_sorter.hpp](src/tape/tape_sorter.hpp), hand
 The project includes 48 unit tests using the GoogleTest framework in [tests.cpp](tests/tests.cpp). Tests cover:
 
  - Different Data Types: Validates sorting with char, short, int, long long, etc.
- - Various Sequences: Tests with random generated sequences.
- - Edge Cases: Handles empty input files, insufficient memory (M).
+ - Various Sequences: Tests with randomly generated sequences.
+ - Edge Cases: Handles empty input files, insufficient memory (`M`).
 
+Config, input and output files are automatically generated in tests folder.
 ### Run the tests using:
 
 ```bash
