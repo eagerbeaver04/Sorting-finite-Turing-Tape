@@ -150,7 +150,7 @@ void test_sorter(Data<T>& data, int start_pos)
         int random_number = dist(gen);
 
         TapeSorter<FileTape, T> sorter(data.configs[i], data.inputs[i],
-            "tests/outputs/output" + std::to_string(i) + ".bin", random_number);
+                data.outputs[i], random_number);
         sorter.sort();
     }
 }
@@ -161,7 +161,7 @@ void bad_test_sorter(Data<T> &data, int start_pos)
     for (int i = start_pos; i < data.number; ++i)
     {
         TapeSorter<FileTape, T> sorter(data.configs[i], data.inputs[i],
-                    "tests/outputs/output" + std::to_string(i) + ".bin", sizeof(T) / 2);
+                data.outputs[i], sizeof(T) / 2);
         sorter.sort();
     }
 }
