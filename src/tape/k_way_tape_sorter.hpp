@@ -21,7 +21,6 @@ private:
     T<N> input_tape;
     T<N> output_tape;
     std::vector<T<N>> tmp_tapes{};
-    std::vector<N> loaded_data{};
     std::priority_queue<
         std::pair<N, int>,
         std::vector<std::pair<N, int>>,
@@ -70,27 +69,27 @@ private:
 
     bool read_chunk()
     {
-        loaded_data.clear();
-        std::ranges::for_each(
-            std::ranges::views::iota(0) | std::ranges::views::take(chunk_size),
-            [&](auto)
-            {
-                std::optional<N> opt_val = input_tape.read();
-                if (!opt_val)
-                    return;
-                loaded_data.push_back(opt_val.value());
-            });
-        utils::merge_sort(loaded_data.begin(), loaded_data.end());
-        if(loaded_data.size() != chunk_size)
-            return false;
-        return true;
+        queue = {};
+        size_t count = 0;
+        while (count < chunk_size)
+        {
+            std::optional<N> opt_val = input_tape.read();
+            if (!opt_val)
+                break;
+            queue.emplace(opt_val.value(), 0); 
+            ++count;
+        }
+        return count == chunk_size;
     }
 
     void save_chunk_in_tape(T<N> &tape)
     {
         tape.rewind();
-        for (auto &&el : loaded_data)
-            tape.write(el);
+        while (!queue.empty())
+        {
+            tape.write(queue.top().first);
+            queue.pop();
+        }
     }
 
     T<N> &get_target_tape(bool alternate)
@@ -99,7 +98,9 @@ private:
     }
 
 public:
-    KWayTapeSorter(const std::string &config_path, const std::string &input_file, const std::string &output_file, size_t max_size, size_t number_of_tapes) : M(max_size), k(number_of_tapes)
+    KWayTapeSorter(const std::string &config_path, const std::string &input_file, 
+        const std::string &output_file, size_t max_size, size_t number_of_tapes) : 
+            M(max_size), k(number_of_tapes)
     {
         if (M < sizeof(N))
             throw std::runtime_error("Too small chunk size!");
@@ -116,7 +117,6 @@ public:
         output_tape = std::move(T<N>{config_path, output_file});
 
         chunk_size = M / sizeof(N);
-        loaded_data.reserve(chunk_size);
 
         size_t total_elements = std::filesystem::file_size(input_file) / sizeof(N);
         chunks_number = (total_elements + chunk_size - 1) / chunk_size;
@@ -140,8 +140,11 @@ public:
         {
             if (!read_chunk())
             {
-                for (auto &&el : loaded_data)
-                    output_tape.write(el);
+                while (!queue.empty())
+                {
+                    output_tape.write(queue.top().first);
+                    queue.pop();
+                }
 
                 merge_inputs.clear();
                 merge_inputs.push_back(output_tape);
