@@ -129,7 +129,8 @@ public:
     {
         size_t current_chunks = 0;
         bool alternate = false;
-
+        std::vector<std::reference_wrapper<T<N>>> merge_inputs{};
+        merge_inputs.reserve(k+1);
         while (true)
         {
             if (!read_chunk())
@@ -139,7 +140,7 @@ public:
                 for (auto &&el : loaded_data)
                     output_tape.write(el);
                 output_tape.rewind();
-                std::vector<std::reference_wrapper<T<N>>> merge_inputs{};
+                merge_inputs.clear();
                 merge_inputs.push_back(output_tape);
 
                 if (alternate)
@@ -160,7 +161,7 @@ public:
         
             if (current_chunks == k)
             {
-                std::vector<std::reference_wrapper<T<N>>> merge_inputs(
+                merge_inputs = std::vector<std::reference_wrapper<T<N>>>(
                     tmp_tapes.begin() + static_cast<int>(alternate),
                     tmp_tapes.begin() + static_cast<int>(alternate) + k + 1);
                 T<N> &target_tape = alternate ? tmp_tapes[0] : tmp_tapes[k+1];
@@ -175,7 +176,7 @@ public:
         }
         if (current_chunks == 0)
         {
-            std::vector<std::reference_wrapper<T<N>>> merge_inputs{};
+            merge_inputs.clear();
             T<N> &target_tape = alternate ? tmp_tapes[0] : tmp_tapes[k + 1];
             merge_inputs.push_back(target_tape);
             merge_chunks(merge_inputs, output_tape);
@@ -183,8 +184,7 @@ public:
         }
         if (current_chunks > 0)
         {
-            std::vector<std::reference_wrapper<T<N>>> merge_inputs(tmp_tapes.begin() + 1,
-                                                                    tmp_tapes.begin() + current_chunks + 1);
+            merge_inputs  = std::vector<std::reference_wrapper<T<N>>>(tmp_tapes.begin() + 1, tmp_tapes.begin() + current_chunks + 1);
             T<N> &target_tape = alternate ? tmp_tapes[0] : tmp_tapes[k + 1];
             merge_inputs.push_back(target_tape);
 
