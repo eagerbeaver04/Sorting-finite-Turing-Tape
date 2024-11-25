@@ -8,3 +8,4 @@ tests/outputs
 tmp
 files/output.bin
 tests/comparison.txt
+k_way_tape_sorting
