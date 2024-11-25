@@ -93,10 +93,11 @@ private:
             tape.write(el);
     }
 
-    size_t get_state(bool f)
+    T<N> &get_target_tape(bool alternate)
     {
-        return f ? 0 : k + 1;
+        return tmp_tapes[alternate ? 0 : k + 1];
     }
+
 public:
     KWayTapeSorter(const std::string &config_path, const std::string &input_file, const std::string &output_file, size_t max_size, size_t number_of_tapes) : M(max_size), k(number_of_tapes)
     {
@@ -145,8 +146,8 @@ public:
                 merge_inputs.clear();
                 merge_inputs.push_back(output_tape);
 
-                merge_inputs.push_back(tmp_tapes[get_state(!alternate)]);
-                merge_chunks(merge_inputs, tmp_tapes[get_state(alternate)]);
+                merge_inputs.push_back(get_target_tape(!alternate));
+                merge_chunks(merge_inputs, get_target_tape(alternate));
 
                 break;
             }
@@ -159,7 +160,7 @@ public:
                 merge_inputs = std::vector<std::reference_wrapper<T<N>>>(
                     tmp_tapes.begin() + static_cast<int>(alternate),
                     tmp_tapes.begin() + static_cast<int>(alternate) + k + 1);
-                T<N> &target_tape = tmp_tapes[get_state(alternate)];
+                T<N> &target_tape = get_target_tape(alternate);
                 merge_chunks(merge_inputs, target_tape);
 
                 alternate = !alternate;
@@ -169,7 +170,7 @@ public:
         if (current_chunks == 0)
         {
             merge_inputs.clear();
-            T<N> &target_tape = tmp_tapes[get_state(alternate)];
+            T<N> &target_tape = get_target_tape(alternate);
             merge_inputs.push_back(target_tape);
             merge_chunks(merge_inputs, output_tape);
             return;
@@ -177,7 +178,7 @@ public:
         if (current_chunks > 0)
         {
             merge_inputs  = std::vector<std::reference_wrapper<T<N>>>(tmp_tapes.begin() + 1, tmp_tapes.begin() + current_chunks + 1);
-            T<N> &target_tape = tmp_tapes[get_state(alternate)];
+            T<N> &target_tape = get_target_tape(alternate);
             merge_inputs.push_back(target_tape);
 
             merge_chunks(merge_inputs, output_tape);
