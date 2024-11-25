@@ -46,8 +46,8 @@ Additionally, the application adheres to the principle of tape integrity. Instea
 Clone the repository and navigate to the project directory:
 
 ```bash
-git clone https://github.com/eagerbeaver04/operating_system.git
-cd operating_system
+git clone https://github.com/eagerbeaver04/Sorting-finite-Turing-Tape.git
+cd Sorting-finite-Turing-Tape
 ```
 
 Use the provided build.sh script to build the project:
