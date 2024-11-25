@@ -75,6 +75,7 @@ or another sorting algorithm
 After that:
  - Enter path to the input tape file.
  - Enter path to the output tape file
+ - Choose variant of app - to print input, sorted and output data, or not
 
 ### Configuration
 

@@ -158,9 +158,9 @@ public:
         
             if (current_chunks == k)
             {
-                merge_inputs = std::vector<std::reference_wrapper<T<N>>>(
+                merge_inputs = std::move(std::vector<std::reference_wrapper<T<N>>>(
                     tmp_tapes.begin() + static_cast<int>(alternate),
-                    tmp_tapes.begin() + static_cast<int>(alternate) + k + 1);
+                    tmp_tapes.begin() + static_cast<int>(alternate) + k + 1));
                 T<N> &target_tape = get_target_tape(alternate);
                 merge_chunks(merge_inputs, target_tape);
 
@@ -178,7 +178,8 @@ public:
         }
         if (current_chunks > 0)
         {
-            merge_inputs  = std::vector<std::reference_wrapper<T<N>>>(tmp_tapes.begin() + 1, tmp_tapes.begin() + current_chunks + 1);
+            merge_inputs  = std::move(std::vector<std::reference_wrapper<T<N>>>(tmp_tapes.begin() + 1, 
+                tmp_tapes.begin() + current_chunks + 1));
             T<N> &target_tape = get_target_tape(alternate);
             merge_inputs.push_back(target_tape);
 
