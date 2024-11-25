@@ -28,6 +28,11 @@ The application sorts integers stored on an input tape (represented as a `.bin` 
 - **Memory Limitation**: Restricts the amount of data loaded from the tape into memory based on the specified `M` bytes.
 - **Unit Testing**: Comprehensive tests using the GoogleTest framework to validate functionality across different scenarios, including edge cases.
 
+## Optimization Philosophy
+A fundamental design choice of this application is the avoidance of using a single tape for both input and output. This stems from physical considerations inspired by real-world tape drives, where the read/write head operates along a single tape. Attempting to simultaneously handle multiple operations on a single tape would be impractical and inefficient in such a system.
+
+Additionally, the application adheres to the principle of tape integrity. Instead of destroying intermediate tapes during sorting, the program rewrites over them to preserve their continuity. This approach not only aligns with the realistic constraints of physical tape systems but also ensures robustness in handling errors or interruptions during the sorting process. By embracing these physical analogies, the application achieves a balance between simplicity, efficiency, and realism.
+
 ## Getting Started
 
 ### Prerequisites
@@ -112,8 +117,10 @@ The FileTape class implements the ITape interface and emulates tape operations u
  - Movement Simulation: Simulates tape movements, including rewinding and moving by positions.
 
 ### TapeSorter Class
-The TapeSorter class, found in [tape_sorter.hpp](src/tape/tape_sorter.hpp), handles the sorting algorithm using temporary tapes. It takes as template any implementation of `ITape` for more to facilitate integration with custom tape implementations.
+The `TapeSorter class`, implemented in [tape_sorter.hpp](src/tape/tape_sorter.hpp), provides an efficient 2-way merge sort algorithm for sorting datasets using temporary tape storage. This class supports any implementation of the `ITape` interface, allowing seamless integration with various custom tape implementations. The algorithm uses only two temporary tapes, ensuring low resource usage and straightforward operation. Its design prioritizes memory efficiency by sorting and merging data in chunks, making it ideal for systems with limited memory resources. For more detailed information, see [tape_sorting.md](docs/tape_sorting.md).
 
+### KWayTapeSorter Class
+The `KWayTapeSorter class`, implemented in [k_way_tape_sorter.hpp](src/tape/k_way_tape_sorter.hpp), extends the functionality of the `TapeSorter` by supporting a k-way merge sort algorithm. This approach leverages multiple temporary tapes to efficiently merge larger datasets in fewer passes. Like `TapeSorter`, it is highly modular and works with any ITape implementation, enabling customization and adaptability for different storage systems. Its k-way sorting strategy significantly reduces the number of merge iterations, improving performance for large-scale datasets. For more detailed information, see [k_way_tape_sorting.md](docs/k_way_tape_sorting.md).
 #### Features:
 
  - Memory Management: Ensures that no more than `M` bytes are loaded into memory at any time.

@@ -1,5 +1,4 @@
 #include <iostream>
-#include "tape/tape_sorter.hpp"
 #include "tape/k_way_tape_sorter.hpp"
 
 int main(int argc, char *argv[])
@@ -18,12 +17,10 @@ int main(int argc, char *argv[])
     std::string output_file;
     std::cin >> output_file;
 
-    TapeSorter<FileTape, int> sorter(std::string(argv[1]), 
-        input_file, output_file, std::stoul(argv[2]));
-
     KWayTapeSorter<FileTape, int> k_way_sorter(std::string(argv[1]),
         input_file, output_file, std::stoul(argv[2]), 10);
-    sorter.sort();
-    
+        
+    k_way_sorter.sort();
+
     return 0;
 }

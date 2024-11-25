@@ -27,9 +27,10 @@ fi
 cd "$initial_dir" || { echo "Failed to exit build directory."; exit 1; }
 
 mv "$initial_dir/build/tape_sorting" "$initial_dir/tape_sorting"
+mv "$initial_dir/build/k_way_tape_sorting" "$initial_dir/k_way_tape_sorting"
 mv "$initial_dir/build/tests/run_tests" "$initial_dir/run_tests"
 
-rm -rf "$initial_dir/build"
+# rm -rf "$initial_dir/build"
 
 mkdir -p "$initial_dir/tmp"
 
