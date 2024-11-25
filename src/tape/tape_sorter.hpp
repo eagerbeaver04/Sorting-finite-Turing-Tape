@@ -162,10 +162,4 @@ public:
                 merge_chunks(tmp_tapes[(i - 1) % 2], tmp_tapes[i % 2]);
         }
     }
-
-    ~TapeSorter()
-    {
-        for (const auto &entry : std::filesystem::directory_iterator("tmp/"))
-            std::filesystem::remove_all(entry.path());
-    }
 };

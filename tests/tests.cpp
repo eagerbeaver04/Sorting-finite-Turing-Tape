@@ -13,7 +13,7 @@ public:
     std::vector<std::string> outputs;
     std::vector<std::vector<T>> data;
     const int number = 10;
-    const int mul = 20;
+    const int mul = 500;
     void file_init()
     {
         for (int i = 0; i < number; ++i)
@@ -119,23 +119,17 @@ protected:
     {
         EXPECT_NO_THROW(data.file_init());
         EXPECT_NO_THROW(data.config_preparation());
+        EXPECT_NO_THROW(data.data_preparation());
     }
 };
 
-TYPED_TEST(FileTapeSorterTest, FileTapeCreation)
-{
-    EXPECT_NO_THROW(this->data.data_preparation());
-}
-
 TYPED_TEST(FileTapeSorterTest, FileTapeEmptyFile)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_NO_THROW(this->data.read_inputs());
 }
 
 TYPED_TEST(FileTapeSorterTest, FileTapeNonEmptyFiles)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_NO_THROW(this->data.read_inputs(1));
 }
 
@@ -169,19 +163,16 @@ void bad_test_sorter(Data<T> &data, int start_pos)
 
 TYPED_TEST(FileTapeSorterTest, TestSortEmptyInputFile)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_ANY_THROW(test_sorter(this->data, 0));
 }
 
 TYPED_TEST(FileTapeSorterTest, TestSortSmallMemoryBound)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_ANY_THROW(bad_test_sorter(this->data, 1));
 }
 
 TYPED_TEST(FileTapeSorterTest, TestSortNonEmptyInputFile)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_NO_THROW(test_sorter(this->data, 1));
     EXPECT_NO_THROW(this->data.read_outputs(1));
 }
@@ -193,25 +184,23 @@ void k_way_test_sorter(Data<T> &data, int start_pos)
     {
         std::random_device rd;
         std::mt19937 gen{rd()};
-        std::uniform_int_distribution<int> dist(sizeof(T) * 3, sizeof(T) * 3 + 1);
+        std::uniform_int_distribution<int> dist(sizeof(T), 100 * sizeof(T));
 
         int random_number = dist(gen);
 
         KWayTapeSorter<FileTape, T> k_sorter(data.configs[i], data.inputs[i],
-            data.outputs[i], random_number, 4);
+            data.outputs[i], random_number, 10);
         k_sorter.sort();
     }
 }
 
 TYPED_TEST(FileTapeSorterTest, KWayTestSortEmptyInputFile)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_ANY_THROW(k_way_test_sorter(this->data, 0));
 }
 
 TYPED_TEST(FileTapeSorterTest, KWayTestSortNonEmptyInputFile)
 {
-    EXPECT_NO_THROW(this->data.data_preparation());
     EXPECT_NO_THROW(k_way_test_sorter(this->data, 1));
     EXPECT_NO_THROW(this->data.read_outputs(1));
 }

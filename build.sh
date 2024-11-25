@@ -40,4 +40,4 @@ mkdir -p "$initial_dir/tests/configs"
 mkdir -p "$initial_dir/tests/inputs"
 mkdir -p "$initial_dir/tests/outputs"
 
-"$initial_dir/tape_sorting" "$initial_dir/config.txt" 1000
+# "$initial_dir/tape_sorting" "$initial_dir/config.txt" 1000
