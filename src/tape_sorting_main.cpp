@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     std::string output_file;
     std::cin >> output_file;
 
-    std::cout << "Do you want to demonstrate input and ouput content? Enter 1 if you want and 0 if you doesn't" << std::endl;
+    std::cout << "Would you like to display the input and output content? Enter 1 for yes or 0 for no:" << std::endl;
     int f;
     std::cin >> f;
     TapeSorter<FileTape, int> sorter(std::string(argv[1]),

@@ -65,18 +65,37 @@ This script will generate three executable files:
 ### Running the Application
 
 Execute the application with the configuration file, and memory limit `M` (1000 in example):
+
+2-way sorting algorithm:
 ```
 ./tape_sorting config.txt 1000
 ```
-or another sorting algorithm
+or k-way sorting algorithm:
 ```
 ./k_way_tape_sorting config.txt 1000
 ```
 After that:
- - Enter path to the input tape file.
- - Enter path to the output tape file
- - Choose variant of app - to print input, sorted and output data, or not
+ - Specify the path to the input tape file.
+ - Specify the path to the output tape file.
+ - Select the application mode:
+    - Print input, sorted, and output data
+    - Run without printing additional information
 
+
+#### Example
+```
+<< Enter input filename:  
+>> files/input.bin  
+
+<< Enter output filename:  
+>> files/output.bin  
+
+<< Would you like to display the input and output content? Enter 1 for yes or 0 for no:   
+>> 1  
+<< input_file: 76 24 80 61 14 58 63 7 23 43 16 32 34 73 13 57 15 69 74 60 36 22 18 51 78 41 10 37 68 47 71 25 6 75 67 28 20 45 12 65 31 66 27 77 62 26 72 52 54 2 29 46 8 55 39 33 5 35 70 4 79 40 50 21 48 44 59 3 30 56 38 9 49 11 1 17 42 64 19 53 
+<< sorted data: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 
+<< output_file: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 
+```
 ### Configuration
 
 Create a configuration file (e.g., config.txt) with the following four delay values in milliseconds:
