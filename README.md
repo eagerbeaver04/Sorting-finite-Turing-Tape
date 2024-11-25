@@ -130,11 +130,12 @@ The `KWayTapeSorter class`, implemented in [k_way_tape_sorter.hpp](src/tape/k_wa
 
 
 ### Testing
-The project includes 48 unit tests using the GoogleTest framework in [tests.cpp](tests/tests.cpp). Tests cover:
+The project includes unit tests using the GoogleTest framework in [tests.cpp](tests/tests.cpp). Tests cover:
 
  - Different Data Types: Validates sorting with char, short, int, long long, etc.
  - Various Sequences: Tests with randomly generated sequences.
  - Edge Cases: Handles empty input files, insufficient memory (`M`).
+ - Comparative Performance: Includes a comparative test of the sorting speed for different algorithms (`2-way TapeSorter` vs. `k-way KWayTapeSorter`). The results of these performance benchmarks are logged in `tests/comparison.txt`, providing detailed metrics for analysis.
 
 Config, input and output files are automatically generated in tests folder.
 ### Run the tests using:
