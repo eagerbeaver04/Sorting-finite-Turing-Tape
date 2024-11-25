@@ -6,7 +6,7 @@
 #include <cstring>
 #include <concepts>
 #include "../interface/i_tape.hpp"
-#include "../interface/delays.hpp"
+#include "delays.hpp"
 
 template<std::integral T>
 class FileTape final : public ITape<T>

@@ -68,6 +68,10 @@ Execute the application with the configuration file, and memory limit `M` (1000 
 ```
 ./tape_sorting config.txt 1000
 ```
+or another sorting algorithm
+```
+./k_way_tape_sorting config.txt 1000
+```
 After that:
  - Enter path to the input tape file.
  - Enter path to the output tape file
