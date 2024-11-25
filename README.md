@@ -19,7 +19,7 @@ This project is a C++20 console application that simulates a tape storage device
 
 ## Overview
 
-The application sorts integers stored on an input tape (represented as a `.bin` file) and writes the sorted data to an output tape. Due to memory limitations (specified by `M` bytes), the application cannot load all data into RAM at once. It uses 2 temporary tapes stored in the `tmp` directory to facilitate sorting. The `M` parameter limits the size of the data chunk read from the tape into memory at a time, but it does not restrict the total RAM usage of the application.
+The application sorts integers stored on an input tape (represented as a `.bin` file) and writes the sorted data to an output tape. Due to memory limitations (specified by `M` bytes), the application cannot load all data into RAM at once. It uses k(2) temporary tapes stored in the `tmp` directory to facilitate sorting. The `M` parameter limits the size of the data chunk read from the tape into memory at a time, but it does not restrict the total RAM usage of the application.
 
 ## Features
 
