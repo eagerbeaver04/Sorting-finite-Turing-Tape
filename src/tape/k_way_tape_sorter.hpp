@@ -93,6 +93,10 @@ private:
             tape.write(el);
     }
 
+    size_t get_state(bool f)
+    {
+        return f ? 0 : k + 1;
+    }
 public:
     KWayTapeSorter(const std::string &config_path, const std::string &input_file, const std::string &output_file, size_t max_size, size_t number_of_tapes) : M(max_size), k(number_of_tapes)
     {
@@ -135,24 +139,15 @@ public:
         {
             if (!read_chunk())
             {
-                std::optional<N> val;
-
                 for (auto &&el : loaded_data)
                     output_tape.write(el);
-                output_tape.rewind();
+
                 merge_inputs.clear();
                 merge_inputs.push_back(output_tape);
 
-                if (alternate)
-                {
-                    merge_inputs.push_back(tmp_tapes[k + 1]);
-                    merge_chunks(merge_inputs, tmp_tapes[0]);
-                }
-                else
-                {
-                    merge_inputs.push_back(tmp_tapes[0]);
-                    merge_chunks(merge_inputs, tmp_tapes[k + 1]);
-                }
+                merge_inputs.push_back(tmp_tapes[get_state(!alternate)]);
+                merge_chunks(merge_inputs, tmp_tapes[get_state(alternate)]);
+
                 break;
             }
 
@@ -164,11 +159,8 @@ public:
                 merge_inputs = std::vector<std::reference_wrapper<T<N>>>(
                     tmp_tapes.begin() + static_cast<int>(alternate),
                     tmp_tapes.begin() + static_cast<int>(alternate) + k + 1);
-                T<N> &target_tape = alternate ? tmp_tapes[0] : tmp_tapes[k+1];
+                T<N> &target_tape = tmp_tapes[get_state(alternate)];
                 merge_chunks(merge_inputs, target_tape);
-
-                for (auto &tape : tmp_tapes)
-                    tape.rewind();
 
                 alternate = !alternate;
                 current_chunks = 0;
@@ -177,7 +169,7 @@ public:
         if (current_chunks == 0)
         {
             merge_inputs.clear();
-            T<N> &target_tape = alternate ? tmp_tapes[0] : tmp_tapes[k + 1];
+            T<N> &target_tape = tmp_tapes[get_state(alternate)];
             merge_inputs.push_back(target_tape);
             merge_chunks(merge_inputs, output_tape);
             return;
@@ -185,7 +177,7 @@ public:
         if (current_chunks > 0)
         {
             merge_inputs  = std::vector<std::reference_wrapper<T<N>>>(tmp_tapes.begin() + 1, tmp_tapes.begin() + current_chunks + 1);
-            T<N> &target_tape = alternate ? tmp_tapes[0] : tmp_tapes[k + 1];
+            T<N> &target_tape = tmp_tapes[get_state(alternate)];
             merge_inputs.push_back(target_tape);
 
             merge_chunks(merge_inputs, output_tape);
