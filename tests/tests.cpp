@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include <random>
 #include <numeric>
+#include <chrono>
+#include <typeinfo>
 #include "../src/tape/tape_sorter.hpp"
 #include "../src/tape/k_way_tape_sorter.hpp"
 
@@ -81,6 +83,24 @@ public:
             ASSERT_EQ(new_data.size(), data[i].size());
             EXPECT_EQ(new_data, data[i]);
         }
+    }
+
+    void read_output(int i)
+    {
+        ASSERT_EQ(std::filesystem::file_size(outputs[i]), std::filesystem::file_size(inputs[i]));
+        FileTape<T> tape(configs[i], outputs[i]);
+        std::vector<T> new_data;
+        std::optional<T> val;
+
+        while ((val = tape.read()))
+            new_data.push_back(val.value());
+
+        std::vector<T> sorted_data = data[i];
+        std::ranges::sort(sorted_data);
+
+        ASSERT_FALSE(sorted_data == data[i]);
+        ASSERT_EQ(new_data.size(), data[i].size());
+        EXPECT_EQ(sorted_data, new_data);
     }
 
     void read_outputs(int start_number = 0)
@@ -205,8 +225,55 @@ TYPED_TEST(FileTapeSorterTest, KWayTestSortNonEmptyInputFile)
     EXPECT_NO_THROW(this->data.read_outputs(1));
 }
 
+template <std::integral T>
+void comparison(Data<T> &data, int start_pos)
+{
+    std::ofstream out_file("tests/comparison.txt", std::ios::app);
+    for (int i = start_pos; i < data.number; ++i)
+    {
+        std::random_device rd;
+        std::mt19937 gen{rd()};
+        std::uniform_int_distribution<int> dist(sizeof(T), 100 * sizeof(T));
+
+        int random_number = dist(gen);
+
+        TapeSorter<FileTape, T> sorter(data.configs[i], data.inputs[i],
+                data.outputs[i], random_number);
+
+        out_file << "Sorting: size of sorting data " << data.data[i].size() << ", using type: " << typeid(T).name() << std::endl;
+        // std::cout << "Sorting: size of sorting data " << data.data[i].size() << std::endl;
+
+        auto start = std::chrono::steady_clock::now();
+        sorter.sort();
+        auto end = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        // std::cout << "\t2-way TapeSorter sorting takes: " << duration.count() << " ms" << std::endl;
+        out_file << "\t2-way TapeSorter sorting takes: " << duration.count() << " ms" << std::endl;
+        EXPECT_NO_THROW(data.read_output(i));
+        for (int num_tapes = 3; num_tapes < 15; ++num_tapes)
+        {
+            KWayTapeSorter<FileTape, T> k_sorter(data.configs[i], data.inputs[i],
+                data.outputs[i], random_number, num_tapes);
+
+            auto k_way_start = std::chrono::steady_clock::now();
+            k_sorter.sort();
+            auto k_way_end = std::chrono::steady_clock::now();
+            auto k_way_duration = std::chrono::duration_cast<std::chrono::milliseconds>(k_way_end - k_way_start);
+            // std::cout << "\tk-way KWayTapeSorter with k = " << num_tapes << " takes: " << k_way_duration.count() << " ms" << std::endl;
+            out_file << "\tk-way KWayTapeSorter with k = " << num_tapes << " takes: " << k_way_duration.count() << " ms" << std::endl;
+            EXPECT_NO_THROW(data.read_output(i));
+        }
+    }
+}
+
+TYPED_TEST(FileTapeSorterTest, comparison)
+{
+    EXPECT_NO_THROW(comparison(this->data, 1));
+}
+
 int main(int argc, char **argv)
 {
+    utils::create_file_if_not_exist("tests/comparison.txt");
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

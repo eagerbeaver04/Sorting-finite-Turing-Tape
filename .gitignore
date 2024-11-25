@@ -7,3 +7,4 @@ tests/inputs
 tests/outputs
 tmp
 files/output.bin
+tests/comparison.txt

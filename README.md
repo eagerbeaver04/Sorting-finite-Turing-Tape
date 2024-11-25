@@ -56,9 +56,10 @@ Use the provided build.sh script to build the project:
 bash build.sh
 ```
 
-This script will generate two executable files:
+This script will generate three executable files:
 
- - tape_sorting: The main application.
+ - tape_sorting: The main application for 2-way sorting.
+ - k_way_tape_sorting: The main application for k-way sorting.
  - run_tests: Runs the unit tests.
 
 ### Running the Application
