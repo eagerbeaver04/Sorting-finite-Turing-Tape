@@ -4,8 +4,7 @@
 #include <algorithm>
 #include <exception>
 #include <queue>
-#include "tape_sorter.hpp"
-#include "file_tmp_manager.hpp"
+#include "tmp_tape_manager.hpp"
 
 template<template <typename> typename T, typename N>
     requires(Tape<T, N>)
@@ -27,8 +26,8 @@ private:
 
     void prepare_tmp_tapes(const std::string &config_path)
     {
-        static_assert(TmpFileManager<T, N>{}, "No partial template specialization!");
-        tmp_tapes = TmpFileManager<T, N>::prepare_tmp_tapes(config_path, k + 2);
+        static_assert(TmpTapeManager<T, N>{}, "No partial template specialization!");
+        tmp_tapes = TmpTapeManager<T, N>::prepare_tmp_tapes(config_path, k + 2);
     }
 
     void merge_chunks(std::vector<std::reference_wrapper<T<N>>> &input_tapes, T<N> &output_tmp_tape)

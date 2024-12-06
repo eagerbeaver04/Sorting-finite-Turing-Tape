@@ -4,7 +4,7 @@
 #include <array>
 #include <ranges>
 #include <algorithm>
-#include "file_tmp_manager.hpp"
+#include "tmp_tape_manager.hpp"
 
 namespace utils
 {
@@ -37,8 +37,8 @@ private:
 
     void prepare_tmp_tapes(const std::string &config_path)
     {
-        static_assert(TmpFileManager<T, N>{}, "No partial template specialization!");
-        tmp_tapes = std::move(TmpFileManager<T, N>::prepare_tmp_tapes(config_path, 2));
+        static_assert(TmpTapeManager<T, N>{}, "No partial template specialization!");
+        tmp_tapes = std::move(TmpTapeManager<T, N>::prepare_tmp_tapes(config_path, 2));
     }
 
     void merge_chunks(T<N>& input_tmp_tape, T<N>& output_tmp_tape)

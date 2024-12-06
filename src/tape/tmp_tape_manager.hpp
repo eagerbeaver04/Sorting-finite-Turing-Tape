@@ -13,7 +13,7 @@ namespace utils
 
 template <template <typename> typename T, typename N>
     requires Tape<T, N>
-struct TmpFileManager : std::bool_constant<false>
+struct TmpTapeManager : std::bool_constant<false>
 {
     static std::vector<T<N>> prepare_tmp_tapes(const std::string &config_path, size_t k)
     {
@@ -22,7 +22,7 @@ struct TmpFileManager : std::bool_constant<false>
 };
 
 template <typename N>
-struct TmpFileManager<FileTape, N> : std::bool_constant<true>
+struct TmpTapeManager<FileTape, N> : std::bool_constant<true>
 {
     static std::vector<FileTape<N>> prepare_tmp_tapes(const std::string &config_path, size_t k)
     {
