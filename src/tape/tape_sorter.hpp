@@ -2,10 +2,9 @@
 
 #include <filesystem>
 #include <array>
-#include <vector>
 #include <ranges>
 #include <algorithm>
-#include "file_tape.hpp"
+#include "file_tmp_manager.hpp"
 
 namespace utils
 {
@@ -21,11 +20,6 @@ namespace utils
             std::ranges::inplace_merge(first, middle, last);
         }
     }
-
-    void create_file_if_not_exist(const std::string &file_path)
-    {
-        std::ofstream file(file_path, std::ios::trunc);
-    }
 }
 
 template <template <typename> typename T, typename N>
@@ -38,17 +32,13 @@ private:
     size_t chunks_number;
     T<N> input_tape;
     T<N> output_tape;
-    std::array<T<N>, 2> tmp_tapes{};
+    std::vector<T<N>> tmp_tapes{};
     std::vector<N> loaded_data{};
 
     void prepare_tmp_tapes(const std::string &config_path)
     {
-        for(size_t i =0; i < tmp_tapes.size(); ++i)
-        {
-            std::string file_path = "tmp/tmp_line_" + std::to_string(i) + ".bin";
-            utils::create_file_if_not_exist(file_path);
-            tmp_tapes[i] = std::move(T<N>(config_path, file_path));
-        }
+        static_assert(TmpFileManager<T, N>{}, "No partial template specialization!");
+        tmp_tapes = std::move(TmpFileManager<T, N>::prepare_tmp_tapes(config_path, 2));
     }
 
     void merge_chunks(T<N>& input_tmp_tape, T<N>& output_tmp_tape)

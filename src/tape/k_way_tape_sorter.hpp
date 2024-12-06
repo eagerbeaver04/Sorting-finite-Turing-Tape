@@ -1,13 +1,13 @@
 #pragma once
 
 #include <array>
-#include <vector>
 #include <algorithm>
 #include <exception>
 #include <queue>
 #include "tape_sorter.hpp"
+#include "file_tmp_manager.hpp"
 
-template <template <typename> typename T, typename N>
+template<template <typename> typename T, typename N>
     requires(Tape<T, N>)
 class KWayTapeSorter
 {
@@ -27,13 +27,8 @@ private:
 
     void prepare_tmp_tapes(const std::string &config_path)
     {
-        tmp_tapes.resize(k+2);
-        for (size_t i = 0; i < k+2; ++i)
-        {
-            std::string file_path = "tmp/tmp_line_" + std::to_string(i) + ".bin";
-            utils::create_file_if_not_exist(file_path);
-            tmp_tapes[i] = std::move(T<N>(config_path, file_path));
-        }
+        static_assert(TmpFileManager<T, N>{}, "No partial template specialization!");
+        tmp_tapes = TmpFileManager<T, N>::prepare_tmp_tapes(config_path, k + 2);
     }
 
     void merge_chunks(std::vector<std::reference_wrapper<T<N>>> &input_tapes, T<N> &output_tmp_tape)

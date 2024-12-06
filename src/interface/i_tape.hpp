@@ -16,3 +16,6 @@ public:
     virtual void read_config(const std::string&) = 0;
     virtual bool is_eof() = 0;
 };
+
+template <template <typename> typename T, typename N>
+concept Tape = std::is_base_of_v<ITape<N>, T<N>>;

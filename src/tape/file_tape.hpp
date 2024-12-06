@@ -98,6 +98,3 @@ public:
         return file.eof();
     }
 };
-
-template <template <typename> typename T, typename N>
-concept Tape = std::is_base_of_v<ITape<N>, T<N>>;
